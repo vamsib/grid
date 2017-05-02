@@ -11,19 +11,19 @@
   document.body.appendChild(grid)
   document.body.appendChild(config_form)
 
-	function select(selector, count, scope) {
-		scope = scope || document
-		var el_list = scope.querySelectorAll(selector)
-		
-		return {
-			extras: function() {
-				return Array.prototype.slice.call(el_list, count)
-			},
-			missing: function() {
-				return range(el_list.length, count)
-			}
-		}
-	}
+  function select(selector, count, scope) {
+    scope = scope || document
+    var el_list = scope.querySelectorAll(selector)
+
+    return {
+      extras: function() {
+        return Array.prototype.slice.call(el_list, count)
+      },
+      missing: function() {
+        return range(el_list.length, count)
+      }
+    }
+  }
 
   offsets = new Proxy({}, {
     set: function(obj, prop, val) {
@@ -37,17 +37,15 @@
 
       if ('dx' == prop) {
         var n_columns = Math.floor(window.innerWidth / val)
-
-				select('.' + COL_CLASS, n_columns, grid).extras().map(function(el) { el.remove() })
-				select('.' + COL_CLASS, n_columns, grid).missing().map(new_el).map(append_to(grid)).map(add_class(COL_CLASS))
+        select('.' + COL_CLASS, n_columns, grid).extras().map(function(el) { el.remove() })
+        select('.' + COL_CLASS, n_columns, grid).missing().map(new_el).map(append_to(grid)).map(add_class(COL_CLASS))
         select('.' + COL_CLASS, 0, grid).extras().map(size_el(val, window.innerHeight)).map(color_blue_green).map(position_one_after_other)
       }
 
       if ('dy' == prop) {
         var n_rows = Math.floor(window.innerHeight / val)
-
-				select('.' + ROW_CLASS, n_rows, grid).extras().map(function(el) { el.remove() })
-				select('.' + ROW_CLASS, n_rows, grid).missing().map(new_el).map(append_to(grid)).map(add_class(ROW_CLASS))
+        select('.' + ROW_CLASS, n_rows, grid).extras().map(function(el) { el.remove() })
+        select('.' + ROW_CLASS, n_rows, grid).missing().map(new_el).map(append_to(grid)).map(add_class(ROW_CLASS))
         select('.' + ROW_CLASS, 0, grid).extras().map(size_el(window.innerWidth, val)).map(color_blue_green).map(position_one_below_other)
       }
     }
@@ -212,5 +210,4 @@
 
     return submit
   }
-
 })()
