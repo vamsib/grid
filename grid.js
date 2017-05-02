@@ -1,6 +1,8 @@
 (function() {
 
   var GRID_CLASS_NAME = 'grid'
+  var COL_CLASS = 'g_col'
+  var ROW_CLASS = 'g_row'
   var GRID_OPACITY = '0.2'
       
   var grid = grid_container(window.innerWidth, window.innerHeight)
@@ -8,6 +10,20 @@
 
   document.body.appendChild(grid)
   document.body.appendChild(config_form)
+
+	function select(selector, count, scope) {
+		scope = scope || document
+		var el_list = scope.querySelectorAll(selector)
+		
+		return {
+			extras: function() {
+				return Array.prototype.slice.call(el_list, count)
+			},
+			missing: function() {
+				return range(el_list.length, count)
+			}
+		}
+	}
 
   offsets = new Proxy({}, {
     set: function(obj, prop, val) {
@@ -20,45 +36,41 @@
       }
 
       if ('dx' == prop) {
-        var n_columns = window.innerWidth / val
-        range(0, n_columns)
-          .map(new_el)
-          .map(size_el(val, window.innerHeight))
-          .map(color_blue_green)
-          .map(position_one_after_other)
-          .map(append_to(grid))
+        var n_columns = Math.floor(window.innerWidth / val)
+
+				select('.' + COL_CLASS, n_columns, grid).extras().map(function(el) { el.remove() })
+				select('.' + COL_CLASS, n_columns, grid).missing().map(new_el).map(append_to(grid)).map(add_class(COL_CLASS))
+        select('.' + COL_CLASS, 0, grid).extras().map(size_el(val, window.innerHeight)).map(color_blue_green).map(position_one_after_other)
       }
 
       if ('dy' == prop) {
-        var n_rows = window.innerHeight / val
-        range(0, n_rows)
-          .map(new_el)
-          .map(size_el(window.innerWidth, val))
-          .map(color_blue_green)
-          .map(position_one_below_other)
-          .map(append_to(grid))
+        var n_rows = Math.floor(window.innerHeight / val)
+
+				select('.' + ROW_CLASS, n_rows, grid).extras().map(function(el) { el.remove() })
+				select('.' + ROW_CLASS, n_rows, grid).missing().map(new_el).map(append_to(grid)).map(add_class(ROW_CLASS))
+        select('.' + ROW_CLASS, 0, grid).extras().map(size_el(window.innerWidth, val)).map(color_blue_green).map(position_one_below_other)
       }
     }
   })
 
-  //offsets.dx = 20
-  //offsets.dy = 20
+  config_form.querySelector('input[name="dx"]').addEventListener('change', function() {
+    offsets.dx = Math.floor(parseFloat(this.value, 10))
+  })
+
+  config_form.querySelector('input[name="dy"]').addEventListener('change', function() {
+    offsets.dy = Math.floor(parseFloat(this.value, 10))
+  })
 
   config_form.addEventListener('submit', function(e) {
     e.preventDefault()
-    dw = this.querySelector('input[name="dx"]').value
-    dh = this.querySelector('input[name="dy"]').value
-    document.querySelectorAll('.grid div').forEach(function(el) {
-      el.remove()
-    })
-    vertical_grid()
-    horizontal_grid()
+    offsets.dx = this.querySelector('input[name="dx"]').value
+    offsets.dy = this.querySelector('input[name="dy"]').value
   })
 
   function append_to(el) {
     return function(child) {
       el.appendChild(child)
-      return el
+      return child 
     }
   }
 
@@ -77,20 +89,20 @@
       height: h + 'px',
       margin: '0px',
       padding: '0px',
-      pointerEvents: 'none'
+      pointerEvents: 'none',
+      textAlign: 'center'
     })
 
     return gc
   }
 
-  function new_el(el, i) {
+  function new_el(i) {
     var el = document.createElement('div')
     Object.assign(el.style, {
       margin: '0px',
       padding: '0px',
       opacity: GRID_OPACITY
     })
-    el.setAttribute('class', (i + 1) % 2 == 0 ? 'even' : 'odd')
     return el
   }
 
@@ -104,6 +116,19 @@
     }
   }
 
+  function add_class(class_name) {
+    return function(el) {
+      if (!has_class(el, class_name)) {
+        if (el.getAttribute('class')) {
+          el.setAttribute('class', el.getAttribute('class') + ' ' + class_name)
+        } else {
+          el.setAttribute('class', class_name)
+        }
+      }
+      return el
+    }
+  }
+
   function has_class(el, class_name) {
     var at_start = "^" + class_name + "\\s+.*$"
     var at_end = "^.*\\s+" + class_name + "$"
@@ -111,11 +136,11 @@
     var only_this = "^" + class_name + "$"
     var regex = new RegExp(only_this + "|" + at_start + "|" + at_end + "|" + in_the_middle)
 
-    return !!el.getAttribute('class').match(regex)
+    return el.getAttribute('class') && !!el.getAttribute('class').match(regex)
   }
 
-  function color_blue_green(el) {
-    el.style.backgroundColor = has_class(el, 'odd') ? 'blue' : 'green'
+  function color_blue_green(el, i) {
+    el.style.backgroundColor = i % 2 == 0 ? 'blue' : 'green'
     return el
   }
 
