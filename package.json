@@ -1,0 +1,33 @@
+{
+  "name": "grid",
+  "version": "1.0.0",
+  "description": "NPM project for GridJS",
+  "main": "grid.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "npm install && ",
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vamsib/grid.git"
+  },
+  "keywords": [
+    "javascript",
+    "browser",
+    "tool",
+    "grid",
+    "layout"
+  ],
+  "author": "Vamsi Bethanabatla",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vamsib/grid/issues"
+  },
+  "homepage": "https://github.com/vamsib/grid#readme",
+  "devDependencies": {
+    "uglify-js": "^2.8.22"
+  }
+}
